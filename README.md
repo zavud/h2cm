@@ -90,7 +90,7 @@ If you don’t have access to Slurm, you can run training manually for each fold
 python models/hybrid/train_model.py 0
 ```
 
-Need help? Reach out via the [📬 Contact](#📬-contact) section below.
+Need help? Reach out via the Contact section below.
 
 ## 🤝 Contributing
 
