@@ -1,4 +1,4 @@
-# H2CM <img src="h2cm_sticker.png" align="right"/>
+# H2CM <img src="h2cm_sticker.png" height=139 align="right"/>
 **Hybrid modeling of global water–carbon cycles constrained by atmospheric and land observations**
 
 A hybrid hydrological‑carbon cycle model (H2CM) that combines a physically‑based process model with deep learning to infer uncertain water‑ and carbon‑cycle parameters from observations while enforcing mass‑balance and other process constraints.
