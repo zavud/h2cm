@@ -57,7 +57,15 @@ A hybrid hydrological‑carbon cycle model (H2CM) that combines a physically‑b
 
 ## 🔄 Reproducibility
 
-All required packages are listed in requirements.txt. Training datasets can be downloaded directly from their original sources (mentioned in the corresponding manuscript). A CUDA‑enabled GPU is required for efficient training and inference; CPU‑only runs may work but will be considerably slower.
+All required packages are listed in requirements.txt. A CUDA‑enabled GPU is required for efficient training and inference; CPU‑only runs may work but will be considerably slower.
+
+## 📊 Training Datasets
+
+The training datasets used in this model are available on Zenodo:
+
+- https://doi.org/10.5281/zenodo.16575309
+
+These datasets include all data required to reproduce the model training.
 
 ## 🚀 Quick Start
 
@@ -91,6 +99,14 @@ python models/hybrid/train_model.py 0
 ```
 
 Need help? Reach out via the Contact section below.
+
+## 📈 Model Simulations
+
+Daily model simulation outputs at the model's native resolution are available on Zenodo:
+
+- https://doi.org/10.5281/zenodo.16572166
+
+These files contain the full set of simulation results used for analysis and evaluation.
 
 ## 🤝 Contributing
 
