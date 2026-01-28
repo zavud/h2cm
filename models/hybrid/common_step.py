@@ -103,25 +103,11 @@ def common_step(self, batch):
     nee_dates = nee_dates[0, :]
     nee_iav_dates = nee_iav_dates[0, :]
 
-    # center target tws around 0 to make it comparable to predicted tws anomalies
-    tws_values = tws.compute_tws_anomaly(tws_values)
-
-    # standardise the constraints
-    tws_values_standardized = hh.standardize_single(data = tws_values, mean = torch.tensor(0.0), std = self.std_tws)
-    et_values_standardized = hh.standardize_single(data = et_values, mean = self.mean_et, std = self.std_et)
-    q_values_standardized = hh.standardize_single(data = q_values, mean = self.mean_q, std = self.std_q)
-    swe_values_standardized = hh.standardize_single(data = swe_values, mean = self.mean_swe, std = self.std_swe)
-    fapar_values_standardized = hh.standardize_single(data = fapar_values, mean = self.mean_fapar, std = self.std_fapar)
-    gpp_values_standardized = hh.standardize_single(data = gpp_values, mean = self.mean_gpp, std = self.std_gpp)
-    nee_values_standardized = hh.standardize_single(data = nee_values, mean = self.mean_nee, std = self.std_nee)
-    nee_iav_values_standardized = hh.standardize_single(data = nee_iav_values, mean = self.mean_nee_iav, std = self.std_nee_iav)
-    cue_ma_values_standardized = hh.standardize_single(data = cue_ma_values, mean = self.mean_cue, std = self.std_cue)
-
     # run forward hybrid computation
     preds_nn, preds_hybrid, learned_constants, _ = self(forcing = forcing, static = static, states_initial = states_spinup)
 
     # get predicted constraint variables from the dictionary. All -> of shape (batch_size, num_time_steps, 1)
-    tws_predicted = preds_hybrid["tws_anomaly_ts"]
+    tws_predicted = preds_hybrid["tws_ts"]
     et_predicted = preds_hybrid["ET_ts"]
     q_predicted = preds_hybrid["runoff_total_ts"]
     swe_predicted = preds_hybrid["swe_ts"]
@@ -146,45 +132,34 @@ def common_step(self, batch):
     # nee_iav_predicted: shape (batch_size, num_time_steps, 1)
     nee_iav_predicted = nee_predicted4iav_monthly - nee_msc_predicted # we define iav/anomaly as difference between predictions and the msc
 
-    # standardize the predictions
-    tws_predicted_standardized = hh.standardize_single(data = tws_predicted, mean = torch.tensor(0.0), std = self.std_tws)
-    et_predicted_standardized = hh.standardize_single(data = et_predicted, mean = self.mean_et, std = self.std_et)
-    q_predicted_standardized = hh.standardize_single(data = q_predicted, mean = self.mean_q, std = self.std_q)
-    swe_predicted_standardized = hh.standardize_single(data = swe_predicted, mean = self.mean_swe, std = self.std_swe)
-    fapar_predicted_standardized = hh.standardize_single(data = fapar_predicted, mean = self.mean_fapar, std = self.std_fapar)
-    # baseflow_k_predicted_standardized = hh.standardize_single(data = baseflow_k_predicted, mean = self.mean_baseflow_k, std = self.std_baseflow_k)
-    gpp_predicted_standardized = hh.standardize_single(data = gpp_predicted, mean = self.mean_gpp, std = self.std_gpp)
-    nee_predicted_standardized = hh.standardize_single(data = nee_predicted, mean = self.mean_nee, std = self.std_nee)
-    nee_iav_predicted_standardized = hh.standardize_single(data = nee_iav_predicted, mean = self.mean_nee_iav, std = self.std_nee_iav)
-
     # filter the dates and values of predictions to match the dates of the corresponding target
-    tws_predicted_standardized, tws_predicted_dates_filtered = hh.filter_matching_dates(data_pred = tws_predicted_standardized, dates_pred = self.dates_prediction, dates_target = tws_dates)
-    et_predicted_standardized, et_predicted_dates_filtered = hh.filter_matching_dates(data_pred = et_predicted_standardized, dates_pred = self.dates_prediction, dates_target = et_dates)
-    q_predicted_standardized, q_predicted_dates_filtered = hh.filter_matching_dates(data_pred = q_predicted_standardized, dates_pred = self.dates_prediction, dates_target = q_dates)
-    swe_predicted_standardized, swe_predicted_dates_filtered = hh.filter_matching_dates(data_pred = swe_predicted_standardized, dates_pred = self.dates_prediction, dates_target = swe_dates)
-    fapar_predicted_standardized, fapar_predicted_dates_filtered = hh.filter_matching_dates(data_pred = fapar_predicted_standardized, dates_pred = self.dates_prediction, dates_target = fapar_dates)
-    gpp_predicted_standardized, gpp_predicted_dates_filtered = hh.filter_matching_dates(data_pred = gpp_predicted_standardized, dates_pred = self.dates_prediction, dates_target = gpp_dates)
-    nee_predicted_standardized, nee_predicted_dates_filtered = hh.filter_matching_dates(data_pred = nee_predicted_standardized, dates_pred = self.dates_prediction, dates_target = nee_dates)
+    tws_predicted, tws_predicted_dates_filtered = hh.filter_matching_dates(data_pred = tws_predicted, dates_pred = self.dates_prediction, dates_target = tws_dates)
+    et_predicted, et_predicted_dates_filtered = hh.filter_matching_dates(data_pred = et_predicted, dates_pred = self.dates_prediction, dates_target = et_dates)
+    q_predicted, q_predicted_dates_filtered = hh.filter_matching_dates(data_pred = q_predicted, dates_pred = self.dates_prediction, dates_target = q_dates)
+    swe_predicted, swe_predicted_dates_filtered = hh.filter_matching_dates(data_pred = swe_predicted, dates_pred = self.dates_prediction, dates_target = swe_dates)
+    fapar_predicted, fapar_predicted_dates_filtered = hh.filter_matching_dates(data_pred = fapar_predicted, dates_pred = self.dates_prediction, dates_target = fapar_dates)
+    gpp_predicted, gpp_predicted_dates_filtered = hh.filter_matching_dates(data_pred = gpp_predicted, dates_pred = self.dates_prediction, dates_target = gpp_dates)
+    nee_predicted, nee_predicted_dates_filtered = hh.filter_matching_dates(data_pred = nee_predicted, dates_pred = self.dates_prediction, dates_target = nee_dates)
     # nee_iav_predicted_standardized is filtered above
 
     # aggregate the needed targets to monthly
-    tws_target_monthly = hh.aggregate_monthly_nan(tws_values_standardized, tws_dates)
-    et_target_monthly = hh.aggregate_monthly_nan(et_values_standardized, et_dates)
-    q_target_monthly = hh.aggregate_monthly_nan(q_values_standardized, q_dates)
-    fapar_target_monthly = hh.aggregate_monthly_nan(fapar_values_standardized, fapar_dates)
-    swe_target_monthly = hh.aggregate_monthly_nan(swe_values_standardized, swe_dates)
-    gpp_target_monthly = hh.aggregate_monthly_nan(gpp_values_standardized, gpp_dates)
-    nee_target_monthly = hh.aggregate_monthly_nan(nee_values_standardized, nee_dates)
-    nee_iav_target_monthly = hh.aggregate_monthly_nan(nee_iav_values_standardized, nee_iav_dates)
+    tws_target_monthly = hh.aggregate_monthly_nan(tws_values, tws_dates)
+    et_target_monthly = hh.aggregate_monthly_nan(et_values, et_dates)
+    q_target_monthly = hh.aggregate_monthly_nan(q_values, q_dates)
+    fapar_target_monthly = hh.aggregate_monthly_nan(fapar_values, fapar_dates)
+    swe_target_monthly = hh.aggregate_monthly_nan(swe_values, swe_dates)
+    gpp_target_monthly = hh.aggregate_monthly_nan(gpp_values, gpp_dates)
+    nee_target_monthly = hh.aggregate_monthly_nan(nee_values, nee_dates)
+    nee_iav_target_monthly = hh.aggregate_monthly_nan(nee_iav_values, nee_iav_dates)
 
     # agregate the needed predictions to monthly
-    tws_predicted_monthly = hh.aggregate_monthly_nan(tws_predicted_standardized, tws_predicted_dates_filtered)
-    et_predicted_monthly = hh.aggregate_monthly_nan(et_predicted_standardized, et_predicted_dates_filtered)
-    q_predicted_monthly = hh.aggregate_monthly_nan(q_predicted_standardized, q_predicted_dates_filtered)
-    fapar_predicted_monthly = hh.aggregate_monthly_nan(fapar_predicted_standardized, fapar_predicted_dates_filtered)
-    swe_predicted_monthly = hh.aggregate_monthly_nan(swe_predicted_standardized, swe_predicted_dates_filtered)
-    gpp_predicted_monthly = hh.aggregate_monthly_nan(gpp_predicted_standardized, gpp_predicted_dates_filtered)
-    nee_predicted_monthly = hh.aggregate_monthly_nan(nee_predicted_standardized, nee_predicted_dates_filtered)
+    tws_predicted_monthly = hh.aggregate_monthly_nan(tws_predicted, tws_predicted_dates_filtered)
+    et_predicted_monthly = hh.aggregate_monthly_nan(et_predicted, et_predicted_dates_filtered)
+    q_predicted_monthly = hh.aggregate_monthly_nan(q_predicted, q_predicted_dates_filtered)
+    fapar_predicted_monthly = hh.aggregate_monthly_nan(fapar_predicted, fapar_predicted_dates_filtered)
+    swe_predicted_monthly = hh.aggregate_monthly_nan(swe_predicted, swe_predicted_dates_filtered)
+    gpp_predicted_monthly = hh.aggregate_monthly_nan(gpp_predicted, gpp_predicted_dates_filtered)
+    nee_predicted_monthly = hh.aggregate_monthly_nan(nee_predicted, nee_predicted_dates_filtered)
     # nee_iav_predicted was aggregated to monthly above
 
     # compute mean seasonal cycles of gpp, et & runoff
@@ -201,8 +176,38 @@ def common_step(self, batch):
     # compute batch level (~global) iav
     # shape: (1, num_time_steps, 1)
     nee_iav_target_avg = hh.weighted_mean(nee_iav_target_monthly, weights = grid_area)
-    nee_iav_predicted_avg = hh.weighted_mean(nee_iav_predicted_standardized, weights = grid_area)
+    nee_iav_predicted_avg = hh.weighted_mean(nee_iav_predicted, weights = grid_area)
 
+    # temporally smooth the time series for NEE IAV using a window size of 7
+    nee_iav_target_avg = hh.temporal_smooth(nee_iav_target_avg, window_size = 7)
+    nee_iav_predicted_avg = hh.temporal_smooth(nee_iav_predicted_avg, window_size = 7)
+
+    # center target tws around 0 to make it comparable to predicted tws anomalies
+    tws_target_monthly = tws.compute_tws_anomaly(tws_target_monthly)
+    tws_predicted_monthly = tws.compute_tws_anomaly(tws_predicted_monthly)
+
+    # standardise the constraints
+    tws_target_monthly = hh.standardize_single(data = tws_target_monthly, mean = torch.tensor(0.0), std = self.std_tws)
+    et_target_monthly = hh.standardize_single(data = et_target_monthly, mean = self.mean_et, std = self.std_et)
+    q_target_monthly = hh.standardize_single(data = q_target_monthly, mean = self.mean_q, std = self.std_q)
+    swe_target_monthly = hh.standardize_single(data = swe_target_monthly, mean = self.mean_swe, std = self.std_swe)
+    fapar_target_monthly = hh.standardize_single(data = fapar_target_monthly, mean = self.mean_fapar, std = self.std_fapar)
+    gpp_target_monthly = hh.standardize_single(data = gpp_target_monthly, mean = self.mean_gpp, std = self.std_gpp)
+    nee_target_monthly = hh.standardize_single(data = nee_target_monthly, mean = self.mean_nee, std = self.std_nee)
+    nee_iav_target_avg = hh.standardize_single(data = nee_iav_target_avg, mean = self.mean_nee_iav, std = self.std_nee_iav)
+    cue_ma_values_standardized = hh.standardize_single(data = cue_ma_values, mean = self.mean_cue, std = self.std_cue)
+
+    # standardize the predictions
+    tws_predicted_monthly = hh.standardize_single(data = tws_predicted_monthly, mean = torch.tensor(0.0), std = self.std_tws)
+    et_predicted_monthly = hh.standardize_single(data = et_predicted_monthly, mean = self.mean_et, std = self.std_et)
+    q_predicted_monthly = hh.standardize_single(data = q_predicted_monthly, mean = self.mean_q, std = self.std_q)
+    swe_predicted_monthly = hh.standardize_single(data = swe_predicted_monthly, mean = self.mean_swe, std = self.std_swe)
+    fapar_predicted_monthly = hh.standardize_single(data = fapar_predicted_monthly, mean = self.mean_fapar, std = self.std_fapar)
+    # baseflow_k_predicted_standardized = hh.standardize_single(data = baseflow_k_predicted, mean = self.mean_baseflow_k, std = self.std_baseflow_k)
+    gpp_predicted_monthly = hh.standardize_single(data = gpp_predicted_monthly, mean = self.mean_gpp, std = self.std_gpp)
+    nee_predicted_monthly = hh.standardize_single(data = nee_predicted_monthly, mean = self.mean_nee, std = self.std_nee)
+    nee_iav_predicted_avg = hh.standardize_single(data = nee_iav_predicted_avg, mean = self.mean_nee_iav, std = self.std_nee_iav)
+    
     # compute the loss for the predictions
     loss_tws_monthly = hh.compute_nan_mse_time(pred = tws_predicted_monthly, target = tws_target_monthly)
     loss_et_monthly = hh.compute_nan_mse_time_2(pred = et_predicted_monthly, target = et_target_monthly)

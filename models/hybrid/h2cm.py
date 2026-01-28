@@ -132,7 +132,6 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
         Es_ts = []
         T_ts = []
         ET_ts = []
-        EF_ts = []
         water_input_ts = []
         r_soil_t_fractions = []
         r_soil_ts = []
@@ -330,7 +329,6 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
                 Es_t = water_cycle_output["Es_t"]
                 T_t = water_cycle_output["T_t"]
                 ET_t = water_cycle_output["ET_t"]
-                EF_t = water_cycle_output["EF_t"]
                 water_input_t = water_cycle_output["water_input_t"]
                 r_soil_t_fraction = water_cycle_output["r_soil_t_fraction"]
                 r_soil_t = water_cycle_output["r_soil_t"]
@@ -374,7 +372,6 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
                 Es_ts.append(Es_t)
                 T_ts.append(T_t)
                 ET_ts.append(ET_t)
-                EF_ts.append(EF_t)
                 water_input_ts.append(water_input_t)
                 r_soil_t_fractions.append(r_soil_t_fraction)
                 r_soil_ts.append(r_soil_t)
@@ -429,10 +426,6 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
 
         if prediction_mode:
 
-            # get anomalies of tws
-            tws_ts_tensor = torch.stack(tws_ts, dim = 1) # of shape (batch_size, num_time_steps, 1)
-            tws_anomaly_ts = tws.compute_tws_anomaly(tws = tws_ts_tensor) # of shape (batch_size, num_time_steps, 1) & (batch_size, 1, 1)
-
             # store the learned global constant variables in a dictionary
             # of shape (0D)
             learned_constants = {
@@ -473,7 +466,6 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
                 "Es_ts": torch.stack(Es_ts, dim = 1),
                 "T_ts": torch.stack(T_ts, dim = 1),
                 "ET_ts": torch.stack(ET_ts, dim = 1),
-                "EF_ts": torch.stack(EF_ts, dim = 1),
                 "water_input_ts": torch.stack(water_input_ts, dim = 1),
                 "r_soil_t_fractions": torch.stack(r_soil_t_fractions, dim = 1),
                 "r_soil_ts": torch.stack(r_soil_ts, dim = 1),
@@ -486,8 +478,8 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
                 "baseflow_ts": torch.stack(baseflow_ts, dim = 1),
                 "runoff_total_ts": torch.stack(runoff_total_ts, dim = 1),
                 "GW_ts": torch.stack(GW_ts, dim = 1),
-                "tws_ts": tws_ts_tensor,
-                "tws_anomaly_ts": tws_anomaly_ts,
+                "tws_ts": torch.stack(tws_ts, dim = 1),
+                # "tws_anomaly_ts": tws_anomaly_ts,
                 "prec_actual_ts": torch.stack(prec_actual_ts, dim = 1),
                 "gpp_ts": torch.stack(gpp_ts, dim = 1),
                 "npp_ts": torch.stack(npp_ts, dim = 1),
@@ -510,10 +502,6 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
                 "beta_q10": beta_q10
             }
 
-            # get anomalies of tws
-            tws_ts_tensor = torch.stack(tws_ts, dim = 1) # of shape (batch_size, num_time_steps, 1)
-            tws_anomaly_ts = tws.compute_tws_anomaly(tws = tws_ts_tensor) # of shape (batch_size, num_time_steps, 1) & (batch_size, 1, 1)
-
             # convert the list of tensors (containing direct NN predictions) into a dictionary containing single 3D arrays
             # of shape (batch_size, num_time_steps, 1)
             preds_nn = {
@@ -526,7 +514,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
                 "swe_ts": torch.stack(swe_ts, dim = 1),
                 "ET_ts": torch.stack(ET_ts, dim = 1),
                 "runoff_total_ts": torch.stack(runoff_total_ts, dim = 1),
-                "tws_anomaly_ts": tws_anomaly_ts,
+                "tws_ts": torch.stack(tws_ts, dim = 1),
                 "gpp_ts": torch.stack(gpp_ts, dim = 1),
                 "nee_ts": torch.stack(nee_ts, dim = 1),
                 "npp_ts": torch.stack(npp_ts, dim = 1)
