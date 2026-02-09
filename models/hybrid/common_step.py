@@ -178,10 +178,6 @@ def common_step(self, batch):
     nee_iav_target_avg = hh.weighted_mean(nee_iav_target_monthly, weights = grid_area)
     nee_iav_predicted_avg = hh.weighted_mean(nee_iav_predicted, weights = grid_area)
 
-    # temporally smooth the time series for NEE IAV using a window size of 7
-    nee_iav_target_avg = hh.temporal_smooth(nee_iav_target_avg, window_size = 7)
-    nee_iav_predicted_avg = hh.temporal_smooth(nee_iav_predicted_avg, window_size = 7)
-
     # center target tws around 0 to make it comparable to predicted tws anomalies
     tws_target_monthly = tws.compute_tws_anomaly(tws_target_monthly)
     tws_predicted_monthly = tws.compute_tws_anomaly(tws_predicted_monthly)
@@ -203,7 +199,6 @@ def common_step(self, batch):
     q_predicted_monthly = hh.standardize_single(data = q_predicted_monthly, mean = self.mean_q, std = self.std_q)
     swe_predicted_monthly = hh.standardize_single(data = swe_predicted_monthly, mean = self.mean_swe, std = self.std_swe)
     fapar_predicted_monthly = hh.standardize_single(data = fapar_predicted_monthly, mean = self.mean_fapar, std = self.std_fapar)
-    # baseflow_k_predicted_standardized = hh.standardize_single(data = baseflow_k_predicted, mean = self.mean_baseflow_k, std = self.std_baseflow_k)
     gpp_predicted_monthly = hh.standardize_single(data = gpp_predicted_monthly, mean = self.mean_gpp, std = self.std_gpp)
     nee_predicted_monthly = hh.standardize_single(data = nee_predicted_monthly, mean = self.mean_nee, std = self.std_nee)
     nee_iav_predicted_avg = hh.standardize_single(data = nee_iav_predicted_avg, mean = self.mean_nee_iav, std = self.std_nee_iav)
