@@ -7,10 +7,10 @@ import torch
 from models.hybrid import hybrid_helpers as hh
 from models.physics.water_cycle import tws
 
-def common_step(self, batch):
+def common_step(self, batch) -> dict:
 
     """
-    This function implements the training step of the hybrid ML model of full coupled water-carbon cycle. This function is meant to be used within the validation/test_step of pytorch lightning.
+    This function implements the training step of the hybrid ML model of full coupled water-carbon cycle. This function is meant to be used within the training/validation/test_step of pytorch lightning.
 
     Arguments:
     self: A pytorch lightning model where the full forward run of the hybrid model of water cycle has been implemented.

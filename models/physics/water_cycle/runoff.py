@@ -4,7 +4,7 @@
 import torch
 
 # surface runoff fraction
-def runoff_surface_frac(r_soil_t_fraction: torch.Tensor, alpha_r_gw_t: torch.Tensor):
+def runoff_surface_frac(r_soil_t_fraction: torch.Tensor, alpha_r_gw_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes surface runoff fraction.
@@ -24,7 +24,7 @@ def runoff_surface_frac(r_soil_t_fraction: torch.Tensor, alpha_r_gw_t: torch.Ten
     return runoff_surface_fraction_t
 
 # surface runoff
-def compute_runoff_surface2(water_input_t: torch.Tensor, runoff_surface_fraction_t: torch.Tensor):
+def compute_runoff_surface2(water_input_t: torch.Tensor, runoff_surface_fraction_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes surface runoff at the current time step.
@@ -43,7 +43,7 @@ def compute_runoff_surface2(water_input_t: torch.Tensor, runoff_surface_fraction
     return runoff_surface_t
 
 # baseflow
-def compute_baseflow(GW_t_prev: torch.Tensor, beta_baseflow: torch.Tensor):
+def compute_baseflow(GW_t_prev: torch.Tensor, beta_baseflow: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes baseflow as a product between groundwater storage at the previous time step and a NN learned scaler beta_baseflow.
@@ -62,7 +62,7 @@ def compute_baseflow(GW_t_prev: torch.Tensor, beta_baseflow: torch.Tensor):
     return baseflow_t
 
 # total runoff
-def compute_runoff_total(runoff_surface_t: torch.Tensor, baseflow_t: torch.Tensor):
+def compute_runoff_total(runoff_surface_t: torch.Tensor, baseflow_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes the total runoff as a sum of surface runoff and baseflow at the current time step.

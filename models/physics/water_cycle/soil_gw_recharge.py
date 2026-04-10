@@ -4,7 +4,7 @@
 import torch
 
 # water input
-def compute_water_input(rainfall_t: torch.Tensor, snow_melt_t: torch.Tensor, Ei_t: torch.Tensor):
+def compute_water_input(rainfall_t: torch.Tensor, snow_melt_t: torch.Tensor, Ei_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes water input as a sum of rainfall, snow melt and interception evaporation (with a negative sign).
@@ -24,7 +24,7 @@ def compute_water_input(rainfall_t: torch.Tensor, snow_melt_t: torch.Tensor, Ei_
     return water_input_t
 
 # soil recharge fraction
-def compute_r_soil_fraction(SM_t: torch.Tensor, SM_max_nn: torch.Tensor, alpha_r_soil: torch.Tensor):
+def compute_r_soil_fraction(SM_t: torch.Tensor, SM_max_nn: torch.Tensor, alpha_r_soil: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes soil recharge fraction soil moisture at the previous time step, a NN learned parameters maximum soil water capacity and alpha_r_soil.
@@ -46,7 +46,7 @@ def compute_r_soil_fraction(SM_t: torch.Tensor, SM_max_nn: torch.Tensor, alpha_r
     return r_soil_t_fraction
 
 # soil recharge fraction 2
-def compute_r_soil_fraction2(SM_t: torch.Tensor, SM_max_nn: torch.Tensor, water_input_t: torch.Tensor, alpha_r_soil_t: torch.Tensor):
+def compute_r_soil_fraction2(SM_t: torch.Tensor, SM_max_nn: torch.Tensor, water_input_t: torch.Tensor, alpha_r_soil_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes soil recharge fraction as a function of soil moisture at the previous time step,
@@ -60,8 +60,8 @@ def compute_r_soil_fraction2(SM_t: torch.Tensor, SM_max_nn: torch.Tensor, water_
     Returns: r_soil_t_fraction (-) containing soil recharge fraction at the current time step. Torch tensor of shape (batch_size, 1)
     """
 
-    # small epsilon value to prevent nominator from becoming 0
-    epsilon = torch.tensor(1e-8) # this is necessary otherwise derivative of the following equation can become undefined (nan) if, e.g. alpha_r_soil_t=1/2
+    # small epsilon value to prevent denominator from becoming 0
+    epsilon = torch.tensor(1e-8) # this is necessary otherwise fraction of the following equation can become undefined (nan) if, e.g. water_input_t=0
 
     # compute current soil moisture deficit
     SM_deficit_t = SM_max_nn - SM_t
@@ -79,7 +79,7 @@ def compute_r_soil_fraction2(SM_t: torch.Tensor, SM_max_nn: torch.Tensor, water_
     return r_soil_fraction_t
 
 # soil recharge
-def compute_r_soil(water_input_t: torch.Tensor, SM_t: torch.Tensor, SM_max_nn: torch.Tensor, r_soil_t_fraction: torch.Tensor):
+def compute_r_soil(water_input_t: torch.Tensor, SM_t: torch.Tensor, SM_max_nn: torch.Tensor, r_soil_t_fraction: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes soil recharge as a function of water input at the current time step, soil moisture at the current time step, 
@@ -114,7 +114,7 @@ def compute_r_soil(water_input_t: torch.Tensor, SM_t: torch.Tensor, SM_max_nn: t
     return r_soil_t, r_soil_remaining_water_t
 
 # soil recharge 2
-def compute_r_soil2(water_input_t: torch.Tensor, r_soil_t_fraction: torch.Tensor):
+def compute_r_soil2(water_input_t: torch.Tensor, r_soil_t_fraction: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes soil recharge as a function of water input at the current time step and soil recharge fraction
@@ -134,7 +134,7 @@ def compute_r_soil2(water_input_t: torch.Tensor, r_soil_t_fraction: torch.Tensor
     return r_soil_t
 
 # groundwater recharge
-def compute_r_gw(water_input_t: torch.Tensor, r_soil_remaining_water_t: torch.Tensor, SM_oveflow_t: torch.Tensor, r_soil_t_fraction: torch.Tensor, alpha_r_gw_t: torch.Tensor):
+def compute_r_gw(water_input_t: torch.Tensor, r_soil_remaining_water_t: torch.Tensor, SM_oveflow_t: torch.Tensor, r_soil_t_fraction: torch.Tensor, alpha_r_gw_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes ground water recharge as a function of water input, soil recharge and a NN learned parameter alpha_r_gw_t.
@@ -160,7 +160,7 @@ def compute_r_gw(water_input_t: torch.Tensor, r_soil_remaining_water_t: torch.Te
     return r_gw_t
 
 # compute fraction of groundwater recharge
-def compute_r_gw_frac(r_soil_t_fraction: torch.Tensor, alpha_r_gw_t: torch.Tensor):
+def compute_r_gw_frac(r_soil_t_fraction: torch.Tensor, alpha_r_gw_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes the fraction of water input that will go to groundwater to recharge it.
@@ -180,7 +180,7 @@ def compute_r_gw_frac(r_soil_t_fraction: torch.Tensor, alpha_r_gw_t: torch.Tenso
     return r_gw_t_fraction_t
 
 # groundwater recharge 2
-def compute_r_gw2(water_input_t: torch.Tensor, r_gw_t_fraction_t: torch.Tensor):
+def compute_r_gw2(water_input_t: torch.Tensor, r_gw_t_fraction_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes ground water recharge as a function of water input, soil recharge fraction and a NN learned parameter alpha_r_gw_t.

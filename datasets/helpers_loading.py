@@ -4,7 +4,7 @@
 import xarray as xr
 
 # load a single dataset
-def load_zarr(zarr_data_path: str, data_name: str):
+def load_zarr(zarr_data_path: str, data_name: str) -> xr.Dataset:
     
     """
     This function is a wrapper around xarray's open_zarr and is created for quickly loading datasets with more intuitive argument names (e.g. zarr_data_path).
@@ -27,7 +27,7 @@ def load_zarr(zarr_data_path: str, data_name: str):
     return zarr_loaded
 
 # load multiple datasets
-def load_zarr_multiple(zarr_data_path: str, data_names: list):
+def load_zarr_multiple(zarr_data_path: str, data_names: list) -> list[xr.Dataset]:
 
     """
     This is a higher level function to load multiple datasets at once using a lower level function load_zarr.

@@ -7,7 +7,7 @@ import torch
 from models.physics.water_cycle import evapotranspiration, gw_storage, runoff, snow, soil_gw_recharge, soil_moisture, tws
 
 # run the forward computation of the full water cycle
-def run_water_cycle_forward(water_cycle_input: dict):
+def run_water_cycle_forward(water_cycle_input: dict) -> dict:
 
     """
     This function runs the full water cycle model in the forward computation. It uses all the lower-level functions in each module of water cycle sub-models.

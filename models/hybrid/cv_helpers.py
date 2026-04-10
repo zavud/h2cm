@@ -9,10 +9,10 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 import dask
 
 # training loop
-def training_loop(dir_trained_models: str, dir_name_new_model: str, zarr_data_path: str, k: int, train_data_loader = None, val_data_loader = None, checkpoints_resume = None):
+def training_loop(dir_trained_models: str, dir_name_new_model: str, zarr_data_path: str, k: int, train_data_loader = None, val_data_loader = None, checkpoints_resume = None) -> None:
 
     """
-    This function starts training the model untill convergence using the k'th cross validation fold.
+    This function starts training the model until convergence using the k'th cross validation fold.
     
     """
 
@@ -48,20 +48,20 @@ def training_loop(dir_trained_models: str, dir_name_new_model: str, zarr_data_pa
     # start the training
     if checkpoints_resume: # if checkpoints are given, then resume from it
 
-        if train_data_loader and val_data_loader: # if the train_data_loader & val_data_loader are both None ...
+        if train_data_loader and val_data_loader: # if the train_data_loader & val_data_loader are both not None ...
 
-            trainer.fit(model = model, train_dataloaders = train_data_loader, val_dataloaders = val_data_loader, ckpt_path = checkpoints_resume) # ... then run the model with the default training and validation data loaders defined within the model
+            trainer.fit(model = model, train_dataloaders = train_data_loader, val_dataloaders = val_data_loader, ckpt_path = checkpoints_resume) # ... then run it using the given data-loaders
 
         else: # otherwise ...
 
-            trainer.fit(model = model, ckpt_path = checkpoints_resume) # ... run it using the given data-loaders
+            trainer.fit(model = model, ckpt_path = checkpoints_resume) # ... run the model with the default training and validation data loaders defined within the model
 
     else:
 
-        if train_data_loader and val_data_loader: # if the train_data_loader & val_data_loader are both None ...
+        if train_data_loader and val_data_loader: # if the train_data_loader & val_data_loader are both not None ...
 
-            trainer.fit(model = model, train_dataloaders = train_data_loader, val_dataloaders = val_data_loader) # ... then run the model with the default training and validation data loaders defined within the model
+            trainer.fit(model = model, train_dataloaders = train_data_loader, val_dataloaders = val_data_loader) # ... then run it using the given data-loaders
 
         else: # otherwise ...
 
-            trainer.fit(model = model) # ... run it using the given data-loaders
+            trainer.fit(model = model) # ... run the model with the default training and validation data loaders defined within the model

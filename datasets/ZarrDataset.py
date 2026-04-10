@@ -1,6 +1,7 @@
 # this module contains the ZarrDataset class
 
 # load libraries
+import numpy as np
 from torch.utils.data import Dataset
 
 # load the custom modules
@@ -9,7 +10,7 @@ import datasets.helpers_preprocessing as hp # helper functions to preprocess the
 
 class ZarrDataset(Dataset): # the custom dataset must inherit from torch.utils.data.Dataset
 
-    def __init__(self, zarr_data_path: str, data_split: str, k: int):
+    def __init__(self, zarr_data_path: str, data_split: str, k: int) -> None:
 
         super().__init__() # initialize the parent class Dataset
 
@@ -56,7 +57,7 @@ class ZarrDataset(Dataset): # the custom dataset must inherit from torch.utils.d
 
                 self.coord_indices = testing
 
-    def __len__(self):
+    def __len__(self) -> int:
 
         # find the number of grids (or examples) in the dataset
         num_grids = self.coord_indices.shape[0]
@@ -64,7 +65,7 @@ class ZarrDataset(Dataset): # the custom dataset must inherit from torch.utils.d
         # return the number of grids in the dataset
         return num_grids
 
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> tuple[np.ndarray, np.ndarray, dict, dict, np.ndarray, tuple[np.ndarray, np.ndarray]]:
 
         # get the index'th latitude and longitude
         index_lat, index_lon = self.coord_indices[index]

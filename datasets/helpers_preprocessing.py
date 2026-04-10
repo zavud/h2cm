@@ -5,7 +5,7 @@ import numpy as np
 import xarray as xr
 
 # get_non_zero_indices
-def get_non_zero_indices(mask: xr.core.dataset.Dataset):
+def get_non_zero_indices(mask: xr.core.dataset.Dataset) -> np.ndarray:
 
     """
     This function is just a wrapper around the numpy's argwhere.
@@ -27,7 +27,7 @@ def get_non_zero_indices(mask: xr.core.dataset.Dataset):
     return non_zero_indices
 
 # get_forcing
-def get_forcing(forcing_list_xrdatasets: list, index_lat: np.int64, index_lon: np.int64):
+def get_forcing(forcing_list_xrdatasets: list, index_lat: np.int64, index_lon: np.int64) -> np.ndarray:
 
     """
     This function takes a list of xarray Datasets and indices of latitude and longitude and
@@ -58,7 +58,7 @@ def get_forcing(forcing_list_xrdatasets: list, index_lat: np.int64, index_lon: n
     return grid_time_series_2Darray
 
 # get_constraints
-def get_constraint(constraint: xr.core.dataset.Dataset, index_lat: np.int64, index_lon: np.int64):
+def get_constraint(constraint: xr.core.dataset.Dataset, index_lat: np.int64, index_lon: np.int64) -> tuple[np.ndarray, np.ndarray]:
 
     """
     This function takes a constraint as an xarray dataset, indices of the selected latitutde and longitute and returns the corresponding
@@ -89,7 +89,7 @@ def get_constraint(constraint: xr.core.dataset.Dataset, index_lat: np.int64, ind
     return constraint_values, constraint_dates
 
 # get_static
-def get_static(static: xr.core.dataset.Dataset, index_lat: np.int64, index_lon: np.int64):
+def get_static(static: xr.core.dataset.Dataset, index_lat: np.int64, index_lon: np.int64) -> np.ndarray:
 
     """
     This function takes the static data as an xarray Dataset, indices of latitude and longitude, and returns the static values for the selected grid.
@@ -114,7 +114,7 @@ def get_static(static: xr.core.dataset.Dataset, index_lat: np.int64, index_lon: 
     return static_values
 
 # combine_features
-def combine_features(forcing: np.ndarray, static: np.ndarray):
+def combine_features(forcing: np.ndarray, static: np.ndarray) -> np.ndarray:
 
     """
     This function takes forcing and static data of a single grid as numpy arrays and combines them. Broadcasting is applied to 
@@ -141,7 +141,7 @@ def combine_features(forcing: np.ndarray, static: np.ndarray):
     return features_combined
 
 # get the exact coordinates of the selected grid
-def get_coords(dataset: xr.core.dataset.Dataset, index_lat: np.int64, index_lon: np.int64):
+def get_coords(dataset: xr.core.dataset.Dataset, index_lat: np.int64, index_lon: np.int64) -> tuple[np.ndarray, np.ndarray]:
 
     """
     This function takes the indices of the latitude and longitude as inputs and returns the exact corresponding latitudes and longitudes.
@@ -169,7 +169,7 @@ def get_coords(dataset: xr.core.dataset.Dataset, index_lat: np.int64, index_lon:
     return lat, lon
 
 # quick & dirty split into train/val/test sets
-def random_split(coord_indices: np.ndarray):
+def random_split(coord_indices: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
     """
     This function is a quick data split into train/val/test sets. It takes as an argument the coordinate indices of the global data.
@@ -205,7 +205,7 @@ def random_split(coord_indices: np.ndarray):
     return training, validation, testing
 
 # Spatial blocking
-def blocks_like(xr_array, num_sets, block_size):
+def blocks_like(xr_array, num_sets, block_size) -> xr.Dataset:
     """
     Creates randomly blocked xr.DataArray with given block_size from 1-``num_stripes``. 
     
@@ -226,7 +226,7 @@ def blocks_like(xr_array, num_sets, block_size):
     b = (np.arange(0, nlat_blocks) * nlon_blocks).reshape(-1, 1)
     b = b.repeat(nlon_blocks, axis=1)
 
-    # Combine lona & lat, repeat to create blocks.
+    # Combine lon & lat, repeat to create blocks.
     b = (a + b).repeat(block_size, axis=0).repeat(block_size, axis=1)
 
     # Increment blocks to cv sets.
@@ -247,7 +247,7 @@ def blocks_like(xr_array, num_sets, block_size):
     return m
 
 # get folds 
-def get_folds(i, num_folds=10):
+def get_folds(i, num_folds=10) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
     """
     This function gets the folds where approx. 80% of grids go to training, 10% go to validation and 10% go to testing sets
@@ -266,7 +266,7 @@ def get_folds(i, num_folds=10):
     return training, validation, test
 
 # get folds for k-fold cross validation
-def get_folds_k(k: int, num_folds: int, get_testing: bool):
+def get_folds_k(k: int, num_folds: int, get_testing: bool) -> tuple[np.ndarray, np.ndarray, np.ndarray] | tuple[np.ndarray, np.ndarray]:
 
     """
     This function gets folds for validation, test and training sets when k-fold cross validation technique is used.
@@ -305,7 +305,7 @@ def get_folds_k(k: int, num_folds: int, get_testing: bool):
         return fold_training, fold_validation
 
 # extract a set of grids for testing
-def get_test_set(mask_xr_array):
+def get_test_set(mask_xr_array) -> tuple[xr.Dataset, xr.Dataset]:
 
     """
     This function extracts about 16.6% of the original global data as a testing set to later test equifinality among the trained multiple models.
@@ -335,7 +335,7 @@ def get_test_set(mask_xr_array):
     return testing_ds, remaining_ds
 
 # random split using spatial blocking
-def random_split_blocking(mask_xr_array):
+def random_split_blocking(mask_xr_array) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
     """
     This function splits the data into train/val/test (80%/10%/10%) sets using the spatial blocking technique in order to reduce the problem of spatial
@@ -370,7 +370,7 @@ def random_split_blocking(mask_xr_array):
     return coords_training, coords_validation, coords_testing
 
 # random split using spatial blocking
-def random_split_blocking_k(mask_xr_array, num_folds: int, k: int, return_back: str):
+def random_split_blocking_k(mask_xr_array, num_folds: int, k: int, return_back: str) -> tuple[np.ndarray, np.ndarray, np.ndarray] | tuple[xr.Dataset, xr.Dataset, xr.Dataset]:
 
     """
     This function splits the data into train/val/test (80%/10%/10%) sets using the spatial blocking technique in order to reduce the problem of spatial

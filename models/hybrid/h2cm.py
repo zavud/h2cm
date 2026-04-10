@@ -17,7 +17,7 @@ from datasets import ZarrDataset as zd
 class H2CM(pl.LightningModule): # inherits from LightningModule
 
     # define the init method
-    def __init__(self, zarr_data_path, device, k): # , monitor, path_monitoring_results):
+    def __init__(self, zarr_data_path, device, k) -> None: # , monitor, path_monitoring_results):
 
         super().__init__() # initialize the parent class
 
@@ -105,7 +105,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
         self.lstm_fc_rb_alpha_Es = neural_networks.LSTM_Dynamic(num_features = 4 + num_static_condensed, num_temporal_outputs = 2, hidden_size_lstm = self.hidden_size_lstm)
 
     # define the hybrid forward computation
-    def forward(self, forcing: torch.Tensor, static: torch.Tensor, states_initial: dict, prediction_mode = False):
+    def forward(self, forcing: torch.Tensor, static: torch.Tensor, states_initial: dict, prediction_mode = False) -> tuple[dict, dict, torch.Tensor, dict, dict] | tuple[dict, dict, dict, dict]:
 
         # activate global constants (beta parameters)
         beta_snow = torch.sigmoid(self.beta_snow)
@@ -555,7 +555,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
 
                 self.log(loss_name + "_training", loss, on_step = False, on_epoch = True, prog_bar = False)
 
-        # if the torch is a finite value
+        # if the loss_sum is a finite value
         if torch.isfinite(losses_all["loss_sum"]):
 
             # return the final loss
@@ -570,7 +570,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
             return None # source: https://github.com/Lightning-AI/pytorch-lightning/issues/4956#issuecomment-738345169
     
     # define the validation step
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch, batch_idx) -> torch.Tensor:
 
         # run the training step
         losses_all = common_step.common_step(self = self, batch = batch)
@@ -589,8 +589,8 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
         # return the loss for swe
         return losses_all["loss_sum"]
 
-    # define the validation step
-    def test_step(self, batch, batch_idx):
+    # define the test step
+    def test_step(self, batch, batch_idx) -> torch.Tensor:
 
         # run the training step
         losses_all = common_step.common_step(self = self, batch = batch)
@@ -604,7 +604,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
         return losses_all["loss_sum"]
     
     # define the optimizer for training the model
-    def configure_optimizers(self):
+    def configure_optimizers(self) -> tuple[list[torch.optim.Optimizer], list[torch.optim.lr_scheduler._LRScheduler]]:
         
         # choose Adam for now
         optimizer = torch.optim.AdamW(self.parameters(), lr = 0.01 / 2)
@@ -616,7 +616,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
         return [optimizer], [scheduler]
     
     # override the clip_gradients method to skip gradient clipping when the loss is not finite
-    def clip_gradients(self, optimizer, gradient_clip_val, gradient_clip_algorithm):
+    def clip_gradients(self, optimizer, gradient_clip_val, gradient_clip_algorithm) -> None:
 
         # only clip if at least one parameter has a grad
         # this effectively skips gradient clipping when the loss is not finite
@@ -624,7 +624,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
             super().clip_gradients(optimizer, gradient_clip_val, gradient_clip_algorithm)
     
     # define train dataloader
-    def train_dataloader(self, data_split = "training"):
+    def train_dataloader(self, data_split = "training") -> torch.utils.data.DataLoader:
 
         # instantiate the training dataset
         dataset = zd.ZarrDataset(zarr_data_path = self.zarr_data_path, data_split = data_split, k = self.k)
@@ -636,7 +636,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
         return dataloader
 
     # define validation dataloader
-    def val_dataloader(self, data_split = "validation"):
+    def val_dataloader(self, data_split = "validation") -> torch.utils.data.DataLoader:
 
         # instantiate the training dataset
         val_dataset = zd.ZarrDataset(zarr_data_path = self.zarr_data_path, data_split = data_split, k = self.k)
@@ -648,7 +648,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
         return val_dataloader
 
     # define test dataloader
-    def test_dataloader(self, data_split = "testing"):
+    def test_dataloader(self, data_split = "testing") -> torch.utils.data.DataLoader:
 
         # instantiate the training dataset
         test_dataset = zd.ZarrDataset(zarr_data_path = self.zarr_data_path, data_split = data_split, k = self.k)
@@ -660,7 +660,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
         return test_dataloader
     
     # define global dataloader
-    def global_dataloader(self, data_split = "global"):
+    def global_dataloader(self, data_split = "global") -> torch.utils.data.DataLoader:
 
         # instantiate the training dataset
         global_dataset = zd.ZarrDataset(zarr_data_path = self.zarr_data_path, data_split = data_split, k = self.k)
@@ -672,7 +672,7 @@ class H2CM(pl.LightningModule): # inherits from LightningModule
         return global_dataloader
     
     # define prediction step
-    def predict_step(self, batch, batch_idx, dataloader_idx=0):
+    def predict_step(self, batch, batch_idx, dataloader_idx=0) -> tuple:
     
         # get the features and constraints from the batch
         forcing, static, constraints_static, constraints_temporal, _, coords = batch

@@ -4,7 +4,7 @@
 from models.physics.carbon_cycle import gpp, ter, nee
 
 # run the forward computation of the full carbon cycle
-def run_carbon_cycle_forward(carbon_cycle_input: dict):
+def run_carbon_cycle_forward(carbon_cycle_input: dict) -> dict:
 
     """
     This function runs the full carbon cycle model in the forward computation. It uses all the lower-level functions in each module of carbon cycle sub-models.

@@ -4,7 +4,7 @@
 import torch
 
 # net ecosystem productivity (NEP)
-def compute_nep(gpp_t: torch.Tensor, ter_t: torch.Tensor):
+def compute_nep(gpp_t: torch.Tensor, ter_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes net ecosystem productivity (NEP) as a difference between gross primary productivity (GPP) and terrestrial ecosystem respiration (TER).
@@ -23,7 +23,7 @@ def compute_nep(gpp_t: torch.Tensor, ter_t: torch.Tensor):
     return nep_t
 
     # Net ecosystem exchange
-def compute_nee(nep_t: torch.Tensor):
+def compute_nee(nep_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function takes NEP at the current time step and negates its sign, which is net ecosystem exchange (NEE).

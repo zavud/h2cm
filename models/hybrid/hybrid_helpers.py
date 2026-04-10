@@ -5,7 +5,7 @@ import xarray as xr
 import numpy as np
 
 # extract statistical data from pytorch's dataset
-def extract_statistics_features(dataset, stat: str):
+def extract_statistics_features(dataset, stat: str) -> tuple[torch.Tensor, torch.Tensor]:
 
     """
     This function extracts statistical data (either mean or standard deviation) for the forcing variables and static data 
@@ -37,7 +37,7 @@ def extract_statistics_features(dataset, stat: str):
     # return the final array
     return stat_forcing, stat_static
 
-def extract_statistics_single(dataset: xr.core.dataset.Dataset, stat: str):
+def extract_statistics_single(dataset: xr.core.dataset.Dataset, stat: str) -> torch.Tensor:
 
     """
     This function quickly extracts the statistical information from a single dataset's attributes.
@@ -65,7 +65,7 @@ def extract_statistics_single(dataset: xr.core.dataset.Dataset, stat: str):
     return stat_tensor
 
 # standardize input data
-def standardize_input(data: torch.Tensor, means: torch.Tensor, stds: torch.Tensor):
+def standardize_input(data: torch.Tensor, means: torch.Tensor, stds: torch.Tensor) -> torch.Tensor:
 
     """
     This function applies the classical Z transformation on the input data.
@@ -90,7 +90,7 @@ def standardize_input(data: torch.Tensor, means: torch.Tensor, stds: torch.Tenso
     return normalized
 
 # standardize single
-def standardize_single(data: torch.Tensor, mean: torch.Tensor, std: torch.Tensor):
+def standardize_single(data: torch.Tensor, mean: torch.Tensor, std: torch.Tensor) -> torch.Tensor:
 
     """
     This function applies the classical Z transformation on a single data.
@@ -115,7 +115,7 @@ def standardize_single(data: torch.Tensor, mean: torch.Tensor, std: torch.Tensor
     return normalized
 
 # custom nan_mse_time loss function
-def compute_nan_mse_time(pred: torch.Tensor, target: torch.Tensor):
+def compute_nan_mse_time(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes mean squared error between the time varying predictions and targets. It deals with the missing values in the target.
@@ -160,10 +160,10 @@ def compute_nan_mse_time(pred: torch.Tensor, target: torch.Tensor):
     return mse_batch
 
 # custom nan_mse_time loss function
-def compute_nan_mse_time_2(pred: torch.Tensor, target: torch.Tensor):
+def compute_nan_mse_time_2(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
 
     """
-    This function is similar to the one above, except that it deals with na's when the 
+    This function is similar to the one above, except that it deals with nan's when the 
      entire grid in the batch is nan (this currently happens with a few grids in GPP).
 
     Arguments:
@@ -206,7 +206,7 @@ def compute_nan_mse_time_2(pred: torch.Tensor, target: torch.Tensor):
     return mse_batch
 
 # custom nan_mse_time loss function
-def compute_nan_mse_static(pred: torch.Tensor, target: torch.Tensor, loss_fn):
+def compute_nan_mse_static(pred: torch.Tensor, target: torch.Tensor, loss_fn: callable) -> torch.Tensor:
 
     """
     This function computes mean squared error between the spatially-only varying predictions and targets. 
@@ -230,7 +230,7 @@ def compute_nan_mse_static(pred: torch.Tensor, target: torch.Tensor, loss_fn):
     return mse
 
 # function for aggregating time-series data into monthly average values
-def aggregate_monthly_nan(values: torch.Tensor, dates: torch.Tensor):
+def aggregate_monthly_nan(values: torch.Tensor, dates: torch.Tensor) -> torch.Tensor:
 
     """
     This function takes values and dates of the values as inputs and computes mean value (ignoring nan values) for each month.
@@ -269,7 +269,7 @@ def aggregate_monthly_nan(values: torch.Tensor, dates: torch.Tensor):
     return monthly_mean_tensor
 
 # get dates from xarray dataset
-def get_dates_as_tensor(dataset: xr.core.dataset.Dataset):
+def get_dates_as_tensor(dataset: xr.core.dataset.Dataset) -> torch.Tensor:
 
     """
     This function takes a dataset as input and returns the actual dates with each month having a unique 'code' (precisely: number of months since the date 1970-01).
@@ -290,7 +290,7 @@ def get_dates_as_tensor(dataset: xr.core.dataset.Dataset):
     return dates
 
 # filter only matching dates between predictions and targets
-def filter_matching_dates(data_pred: torch.Tensor, dates_pred: torch.Tensor, dates_target: torch.Tensor):
+def filter_matching_dates(data_pred: torch.Tensor, dates_pred: torch.Tensor, dates_target: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
 
     """
     This function compares prediction dates to target dates and returns the dates and values of prediction that also exist in target.
@@ -322,7 +322,7 @@ def filter_matching_dates(data_pred: torch.Tensor, dates_pred: torch.Tensor, dat
     return data_pred_filtered, dates_pred_filtered
 
 # compute mean seasonal cycle
-def compute_msc_monthly(data: torch.Tensor):
+def compute_msc_monthly(data: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes mean seasonal cycle of the input that is monthly.
@@ -334,7 +334,7 @@ def compute_msc_monthly(data: torch.Tensor):
     msc: Mean seasonal cycle of the given data. Torch tensor of shape (batch_size, 12, 1)
     """
 
-    # get the bathc size
+    # get the batch size
     batch_size = data.shape[0]
 
     # compute mean seasonal cycle
@@ -344,7 +344,7 @@ def compute_msc_monthly(data: torch.Tensor):
     return msc
 
 # function to compute area weighted mean
-def weighted_mean(data: torch.Tensor, weights: torch.Tensor):
+def weighted_mean(data: torch.Tensor, weights: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes the area weighted mean of the given data using the provided weights.
@@ -366,7 +366,7 @@ def weighted_mean(data: torch.Tensor, weights: torch.Tensor):
     # return the final weighted average data
     return weighted_avg
 
-def prior_deviation_loss(estimate: torch.Tensor, prior: torch.Tensor, prior_std: torch.Tensor):
+def prior_deviation_loss(estimate: torch.Tensor, prior: torch.Tensor, prior_std: torch.Tensor) -> torch.Tensor:
     
     """
     Compute the normalized squared deviation from a Gaussian prior:

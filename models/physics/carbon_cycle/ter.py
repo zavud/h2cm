@@ -4,7 +4,7 @@
 import torch
 
 # Net primary productivity (NPP)
-def compute_npp(gpp_t: torch.Tensor, cue_t: torch.Tensor):
+def compute_npp(gpp_t: torch.Tensor, cue_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function models net primary productivity at the current time step as a function of GPP and a NN learned parameter cue_t (~CUE).
@@ -23,7 +23,7 @@ def compute_npp(gpp_t: torch.Tensor, cue_t: torch.Tensor):
     return npp_t
 
 # autotrophic respiration
-def compute_Ra(gpp_t: torch.Tensor, npp_t: torch.Tensor):
+def compute_Ra(gpp_t: torch.Tensor, npp_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes autotrophic respiration (Ra) as a function of GPP and NPP (all at the current time step).
@@ -42,7 +42,7 @@ def compute_Ra(gpp_t: torch.Tensor, npp_t: torch.Tensor):
     return Ra_t
 
 # heterotrophic respiration
-def compute_Rh(tair_t_celsius: torch.Tensor, basal_resp_rate_t: torch.Tensor, Q10_value: int, ref_temp: int = 15):
+def compute_Rh(tair_t_celsius: torch.Tensor, basal_resp_rate_t: torch.Tensor, Q10_value: int, ref_temp: int = 15) -> torch.Tensor:
 
     """
     This function computes heterotrophic respiration using Q10 function as a function of the current air temperature and a NN learned variable basal_resp_rate_t (~Basal respiration).
@@ -66,7 +66,7 @@ def compute_Rh(tair_t_celsius: torch.Tensor, basal_resp_rate_t: torch.Tensor, Q1
     return Rh_t
 
 # terrestrial ecosystem respiration
-def compute_ter(Ra_t: torch.Tensor, Rh_t: torch.Tensor):
+def compute_ter(Ra_t: torch.Tensor, Rh_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes Terrestrial ecosystem respiration (TER) by adding autotrophic respiration and hetetrophic respiration.

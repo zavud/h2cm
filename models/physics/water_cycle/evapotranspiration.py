@@ -4,7 +4,7 @@
 import torch
 
 # Rainfall
-def compute_rainfall(prec_t: torch.Tensor, tair_t_celsius: torch.Tensor):
+def compute_rainfall(prec_t: torch.Tensor, tair_t_celsius: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes rainfall as a function of precipitation and air temperature. Rainfall is simply the precipitation, if the air temperature is greater than 0. 
@@ -32,7 +32,7 @@ def compute_rainfall(prec_t: torch.Tensor, tair_t_celsius: torch.Tensor):
     return rainfall_t
 
 # interception evaporation
-def compute_Ei(rainfall_t: torch.Tensor, fAPAR_nn_t: torch.Tensor, rn_t_mm: torch.Tensor, alpha_Ei_t: torch.Tensor):
+def compute_Ei(rainfall_t: torch.Tensor, fAPAR_nn_t: torch.Tensor, rn_t_mm: torch.Tensor, alpha_Ei_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes interception evaporation as a function of rainfall, fAPAR and a NN learned parameter alpha_Ei.
@@ -59,7 +59,7 @@ def compute_Ei(rainfall_t: torch.Tensor, fAPAR_nn_t: torch.Tensor, rn_t_mm: torc
     return Ei_t
 
 # convert rn from Watts per square meter per day to mm per day
-def convert_rn_to_mm(rn_t: torch.Tensor):
+def convert_rn_to_mm(rn_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function converts Net radiation's unit from Watts per square meter per day to mm per day.
@@ -82,7 +82,7 @@ def convert_rn_to_mm(rn_t: torch.Tensor):
     return rn_t_mm
 
 # convert negative values of rn_t_mm to 0
-def make_zero_if_negative(rn_t_mm: torch.Tensor):
+def make_zero_if_negative(rn_t_mm: torch.Tensor) -> torch.Tensor:
 
     """
     This function converts negative values of net radiation (mm) to 0 for physical computation (not used as an input).
@@ -100,7 +100,7 @@ def make_zero_if_negative(rn_t_mm: torch.Tensor):
     return rn_t_mm_converted
 
 # update net radiation
-def update_Rn(rn_t_mm: torch.Tensor, water_flux_t: torch.Tensor):
+def update_Rn(rn_t_mm: torch.Tensor, water_flux_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function subtracts interception evaporation (Ei) or soil evaporation (Es) from net radiation (Rn).
@@ -120,7 +120,7 @@ def update_Rn(rn_t_mm: torch.Tensor, water_flux_t: torch.Tensor):
 
 
 # compute potential evapotranspiration
-def compute_ET_pot(rn_t_mm: torch.Tensor, SM_t: torch.Tensor):
+def compute_ET_pot(rn_t_mm: torch.Tensor, SM_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes potential evapotranspiration as a function of net radiation and soil moisture.
@@ -139,7 +139,7 @@ def compute_ET_pot(rn_t_mm: torch.Tensor, SM_t: torch.Tensor):
     return ET_pot_t
 
 # soil evaporation 3 (new implementation)
-def compute_Es3(fAPAR_nn_t: torch.Tensor, ET_pot_t: torch.tensor, alpha_Es_t: torch.tensor):
+def compute_Es3(fAPAR_nn_t: torch.Tensor, ET_pot_t: torch.tensor, alpha_Es_t: torch.tensor) -> torch.Tensor:
 
     """
     This function computes soil evaporation as a function of fapar, potential ET and two NN learned parameters.
@@ -165,7 +165,7 @@ def compute_Es3(fAPAR_nn_t: torch.Tensor, ET_pot_t: torch.tensor, alpha_Es_t: to
     return Es_t
 
 # transpiration 2
-def compute_T2(fAPAR_nn_t: torch.Tensor, ET_pot_t: torch.Tensor, alpha_T_t: torch.Tensor):
+def compute_T2(fAPAR_nn_t: torch.Tensor, ET_pot_t: torch.Tensor, alpha_T_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes transpiration as a function of fapar, potential ET and two NN learned parameters.
@@ -175,23 +175,23 @@ def compute_T2(fAPAR_nn_t: torch.Tensor, ET_pot_t: torch.Tensor, alpha_T_t: torc
     ET_pot_t:  Potential evapotranspiration (mm/day). Torch tensor of shape (batch_size, 1)
     alpha_T_t: NN learned parameter varied both in space and time. Torch tensor of shape (batch_size, 1)
     
-    Returns: Es_t containing soil evaporation. Torch tensor of shape (batch_size, 1)
+    Returns: T_t containing transpiration (mm/day). Torch tensor of shape (batch_size, 1)
     """
 
     # compute/model plant coverage as approx. being vegetation/fapar in the grid
     plant_coverage_t = fAPAR_nn_t # of shape (batch_size, 1)
 
-    # compute potential soil evaporation
+    # compute potential transpiration
     T_pot_t = plant_coverage_t * ET_pot_t
 
-    # compute final soil evaporation using NN learned parameters
+    # compute final transpiration using NN learned parameters
     T_t = T_pot_t * alpha_T_t
 
     # return the final soil evaporation
     return T_t
 
 # evapotranspiration
-def compute_ET(Ei_t: torch.Tensor, Es_t: torch.Tensor, T_t: torch.Tensor):
+def compute_ET(Ei_t: torch.Tensor, Es_t: torch.Tensor, T_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes evapotranspiration as a sum of interception evaporation, soil evaporation and transpiration at the

@@ -4,7 +4,7 @@
 import torch
 
 # update soil moisture
-def update_SM(SM_current_or_prev: torch.Tensor, r_soil_t: torch.Tensor, T_t: torch.Tensor, Es_t: torch.Tensor):
+def update_SM(SM_current_or_prev: torch.Tensor, r_soil_t: torch.Tensor, T_t: torch.Tensor, Es_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function updates soil moisture at the current time step by adding soil moisture at the previous or current time step, soil recharge,
@@ -26,7 +26,7 @@ def update_SM(SM_current_or_prev: torch.Tensor, r_soil_t: torch.Tensor, T_t: tor
     return SM_t
 
 # compute soil moisture overflow
-def compute_SM_overflow(SM_t: torch.Tensor, SM_max_nn: torch.Tensor):
+def compute_SM_overflow(SM_t: torch.Tensor, SM_max_nn: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes the overflow of water from soil. This ensures that current soil moisture cannot exceed the maximum water holding capacity of soil.
@@ -46,7 +46,7 @@ def compute_SM_overflow(SM_t: torch.Tensor, SM_max_nn: torch.Tensor):
     return SM_oveflow_t
 
 # remove overflow from soil moisture
-def remove_SM_overflow(SM_t: torch.Tensor, SM_oveflow_t: torch.Tensor):
+def remove_SM_overflow(SM_t: torch.Tensor, SM_oveflow_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function removes the overflow of water from soil moisture.
@@ -69,7 +69,7 @@ def remove_SM_overflow(SM_t: torch.Tensor, SM_oveflow_t: torch.Tensor):
     return SM_t_overflow_removed
 
 # relative soil moisture
-def compute_relative_SM(SM_t: torch.Tensor, SM_max_nn: torch.Tensor):
+def compute_relative_SM(SM_t: torch.Tensor, SM_max_nn: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes relative soil moisture (or, soil moisture fraction) at the current time step.

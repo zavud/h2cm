@@ -4,7 +4,7 @@
 import torch
 
 # terrestrial water storage
-def compute_tws(swe_t: torch.Tensor, GW_t: torch.Tensor, SM_t: torch.Tensor):
+def compute_tws(swe_t: torch.Tensor, GW_t: torch.Tensor, SM_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes terrestrial water storage at the current time step as a sum of snow water equivalent, groundwater storage and soil moisture
@@ -25,7 +25,7 @@ def compute_tws(swe_t: torch.Tensor, GW_t: torch.Tensor, SM_t: torch.Tensor):
     return tws_t
 
 # get anomalies of terrestrial water storage
-def compute_tws_anomaly(tws: torch.Tensor):
+def compute_tws_anomaly(tws: torch.Tensor) -> torch.Tensor:
 
     """
     This function takes the predicted (hybrid predictions) TWS (for all time steps/after the time loop) and subtracts the average value over time series for each grid. 

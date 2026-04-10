@@ -4,7 +4,7 @@
 import torch
 
 # groundwater storage
-def update_GW(GW_t_prev: torch.Tensor, r_gw_t: torch.Tensor, baseflow_t: torch.Tensor):
+def update_GW(GW_t_prev: torch.Tensor, r_gw_t: torch.Tensor, baseflow_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function updates groundwater storage at the current time step by adding groundwater storage at the previous time step,

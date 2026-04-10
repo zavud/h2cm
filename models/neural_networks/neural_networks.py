@@ -6,7 +6,7 @@ import torch
 # fully-connected NN layer to reduce the dimensions of static input and predict static outputs
 class FC_Static(torch.nn.Module):
 
-    def __init__(self, num_static_input, num_static_out, hidden_size1 = 150, hidden_size2 = 12): # initialise the class
+    def __init__(self, num_static_input, num_static_out, hidden_size1 = 150, hidden_size2 = 12) -> None: # initialise the class
 
         # initialise the parent module from torch
         super().__init__()
@@ -14,14 +14,14 @@ class FC_Static(torch.nn.Module):
         # fc1 takes the static inputs, and outputs higher-dimensional representations
         self.fc1 = torch.nn.Linear(in_features = num_static_input, out_features = hidden_size1)
 
-        # fc2 takes the output from fc1 (100D) and reduces the dimension to 12
+        # fc2 takes the output from fc1 (150D) and reduces the dimension to 12
         self.fc2 = torch.nn.Linear(in_features = hidden_size1, out_features = hidden_size2)
 
         # fc3 takes the output from fc2 (12D) and predicts static outputs
         self.fc3 = torch.nn.Linear(in_features = hidden_size2, out_features = num_static_out)
 
     # define the forward run
-    def forward(self, input_static):
+    def forward(self, input_static) -> tuple[torch.Tensor, torch.Tensor]:
 
         # get the higher-dimensional representation of the static input
         out_highD = self.fc1(input_static) # of shape (batch_size, hidden_size1)
@@ -41,7 +41,7 @@ class FC_Static(torch.nn.Module):
 class LSTM_Dynamic(torch.nn.Module):
 
     # initialise the class
-    def __init__(self, num_features, num_temporal_outputs, hidden_size_lstm = 100):
+    def __init__(self, num_features, num_temporal_outputs, hidden_size_lstm = 100) -> None:
 
         # initialise the parent module from torch
         super().__init__()
@@ -53,8 +53,8 @@ class LSTM_Dynamic(torch.nn.Module):
         self.fc = torch.nn.Linear(in_features = hidden_size_lstm, out_features = num_temporal_outputs)
     
     # define the forward run
-    def forward(self, features_t, h_t, c_t):
-        
+    def forward(self, features_t, h_t, c_t) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+
         # get the hidden and cell states of LSTM cell
         h_t, c_t = self.lstm_cell(features_t, (h_t, c_t)) # of shape (batch_size, hidden_size_lstm)
 

@@ -4,7 +4,7 @@
 import torch
 
 # convert air temperature from Kelvin to Celsius
-def convert_tair(tair_t: torch.Tensor):
+def convert_tair(tair_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function converts air temperature's unit from Kelvin to Celsius.
@@ -22,7 +22,7 @@ def convert_tair(tair_t: torch.Tensor):
     return tair_t_celsius
 
 # snow accumulation
-def compute_snow_acc(prec_t: torch.Tensor, beta_snow: torch.Tensor, tair_t_celsius: torch.Tensor):
+def compute_snow_acc(prec_t: torch.Tensor, beta_snow: torch.Tensor, tair_t_celsius: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes snow accumulation as a function of precipitation, a NN learnable parameter beta_snow and air temperature.
@@ -49,7 +49,7 @@ def compute_snow_acc(prec_t: torch.Tensor, beta_snow: torch.Tensor, tair_t_celsi
     return snow_acc_t
 
 # snow melt
-def compute_snow_melt(swe_t_prev: torch.Tensor, tair_t_celsius: torch.Tensor, alpha_snow_melt_t: torch.Tensor):
+def compute_snow_melt(swe_t_prev: torch.Tensor, tair_t_celsius: torch.Tensor, alpha_snow_melt_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function computes snow melt as a function of air temperature and a NN learned parameter alpha snow melt.
@@ -73,7 +73,7 @@ def compute_snow_melt(swe_t_prev: torch.Tensor, tair_t_celsius: torch.Tensor, al
     return snow_melt_t
 
 # update snow water equivalent
-def update_swe(swe_t_prev: torch.Tensor, snow_acc_t: torch.Tensor, snow_melt_t: torch.Tensor):
+def update_swe(swe_t_prev: torch.Tensor, snow_acc_t: torch.Tensor, snow_melt_t: torch.Tensor) -> torch.Tensor:
 
     """
     This function updates snow water equivalent (swe) as a function of swe at the previous time step, snow accumulation and snow melt.

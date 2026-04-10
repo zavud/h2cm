@@ -4,10 +4,10 @@
 import torch
 
 # gross primary productivity (GPP)
-def compute_gpp(T_t: torch.Tensor, CO2_t: torch.Tensor, wue_t: torch.Tensor, beta_co2: torch.Tensor):
+def compute_gpp(T_t: torch.Tensor, CO2_t: torch.Tensor, wue_t: torch.Tensor, beta_co2: torch.Tensor) -> torch.Tensor:
 
     """
-    This function computes GPP at the current time step as a function of transpiration, VPD, CO2 concentration in the atm.,
+    This function computes GPP at the current time step as a function of transpiration, (VPD,) CO2 concentration in the atm.,
       and a NN learned variable wue_t, and a learned global constant beta_co2
 
     Arguments:
